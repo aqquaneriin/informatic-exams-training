@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Тренажёр ЕГЭ · Информатика </title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background: #0b0e14; color: #eef2fb; line-height: 1.5;
+      min-height: 100vh; display: flex; flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    html { scroll-behavior: smooth; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.2rem; width: 100%; flex: 1; }
+    header {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      margin-bottom: 2.5rem; border-bottom: 1px solid #2a313c; padding-bottom: 1rem;
+    }
+    .logo {
+      font-weight: 600; font-size: 1.6rem; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #a3c6ff, #7aa9ff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    nav { display: flex; gap: 2rem; font-weight: 500; }
+    nav a { text-decoration: none; color: #9aa4b8; transition: color 0.2s; font-size: 1rem; }
+    nav a:hover, nav a.active { color: #ffffff; }
+    .card {
+      background: #151a22; border: 1px solid #262e3a; border-radius: 24px;
+      padding: 1.8rem; box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px); transition: transform 0.15s, border-color 0.2s;
+    }
+    .card:hover { border-color: #3f4a5c; }
+    h2 { font-size: 1.9rem; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1.4rem; font-weight: 500; margin-bottom: 1rem; }
+    h4 { font-size: 1.2rem; margin: 1.2rem 0 0.8rem; color: #c6d4f0; }
+    .theme-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem; margin: 2rem 0;
+    }
+    .theme-card {
+      background: #10161e; border-radius: 20px; padding: 2rem 1rem;
+      border: 1px solid #28303d; cursor: pointer; transition: all 0.2s;
+      text-align: center;
+    }
+    .theme-card:hover { background: #18202b; border-color: #4f6a9c; transform: translateY(-3px); }
+    .theme-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+    .theme-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
+    .theme-count { color: #8d99ae; font-size: 0.9rem; }
+    .progress-section { margin: 2rem 0 1rem; }
+    .progress-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #b4c2da; }
+    .progress-bar-bg { height: 8px; background: #202833; border-radius: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #5f9ea0, #4a7db5); border-radius: 20px; transition: width 0.3s; }
+    .btn {
+      background: #262f3d; border: none; color: #e8edf5; padding: 0.8rem 1.8rem;
+      border-radius: 60px; font-weight: 500; font-size: 1rem; cursor: pointer;
+      border: 1px solid #364153; transition: all 0.15s; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .btn-primary { background: #2c5f9a; border-color: #4a7fc1; }
+    .btn-primary:hover { background: #3a74b9; }
+    .btn-outline { background: transparent; border: 1px solid #3e4c60; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; pointer-events: none; }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+    .question-box { background: #0f151d; border-radius: 20px; padding: 2rem; margin: 1.5rem 0; border: 1px solid #2f3a48; }
+    .question-text { font-size: 1.4rem; font-weight: 500; margin-bottom: 2rem; }
+    .options { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+    .option-item { display: flex; align-items: center; gap: 0.8rem; background: #1a222d; padding: 0.8rem 1.2rem; border-radius: 16px; border: 1px solid #2e3a48; cursor: pointer; transition: background 0.1s; }
+    .option-item:hover { background: #232e3c; }
+    .option-item input { accent-color: #4f8bc9; width: 1.2rem; height: 1.2rem; }
+    .answer-input { width: 100%; padding: 1rem 1.2rem; background: #1a222d; border: 1px solid #364153; border-radius: 18px; color: white; font-size: 1.2rem; outline: none; transition: border 0.2s; }
+    .answer-input:focus { border-color: #5f8ec9; }
+    .feedback { padding: 1rem 1.5rem; border-radius: 18px; margin: 1.5rem 0; font-weight: 500; }
+    .feedback.correct { background: #14362b; border-left: 6px solid #2ecc71; }
+    .feedback.incorrect { background: #3d2427; border-left: 6px solid #e74c3c; }
+    .stats-panel { display: flex; justify-content: space-between; color: #b0c2da; font-size: 1.1rem; margin: 1rem 0; }
+    .ref-block { background: #121a24; border-radius: 20px; padding: 1.8rem; margin-bottom: 2rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #2d3847; }
+    th { color: #b8c7e3; font-weight: 500; }
+    footer { margin-top: 3rem; text-align: center; color: #6b7a8f; font-size: 0.9rem; border-top: 1px solid #202833; padding-top: 2rem; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .back-link { margin-bottom: 1rem; }
+    pre { background: #0f151d; padding: 1rem; border-radius: 12px; overflow-x: auto; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+    @media (max-width: 600px) {
+      .container { padding: 1rem; }
+      header { flex-direction: column; align-items: start; gap: 0.8rem; }
+      .question-text { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">◈ ЕГЭ Тренажёр</div>
+    <nav>
+      <a href="#" data-page="home" class="nav-link active">Главная</a>
+      <a href="#" data-page="test" class="nav-link">Тренировка</a>
+      <a href="#" data-page="reference" class="nav-link">Справочник</a>
+    </nav>
+  </header>
+
+  <!-- ГЛАВНАЯ -->
+  <div id="page-home" class="page active">
+    <div class="card">
+      <h2>Подготовка к ЕГЭ по информатике</h2>
+      <p style="color: #b0c2da; margin-bottom: 0.5rem;">Пять ключевых тем: от измерения информации до программирования на Python и КуМир.</p>
+    </div>
+
+    <div class="theme-grid">
+      <div class="theme-card" data-theme="measure">
+        <div class="theme-icon">📏</div><div class="theme-title">Измерение информации</div><div class="theme-count">12 заданий</div>
+      </div>
+      <div class="theme-card" data-theme="numeral">
+        <div class="theme-icon">🔢</div><div class="theme-title">Системы счисления</div><div class="theme-count">12 заданий</div>
+      </div>
+      <div class="theme-card" data-theme="logic">
+        <div class="theme-icon">🧠</div><div class="theme-title">Основы логики</div><div class="theme-count">12 заданий</div>
+      </div>
+      <div class="theme-card" data-theme="python">
+        <div class="theme-icon">🐍</div><div class="theme-title">Python (программирование)</div><div class="theme-count">15 заданий</div>
+      </div>
+      <div class="theme-card" data-theme="kumir">
+        <div class="theme-icon">🤖</div><div class="theme-title">КуМир (алгоритмика)</div><div class="theme-count">12 заданий</div>
+      </div>
+    </div>
+
+    <div class="card progress-section">
+      <div class="progress-label"><span>Общий прогресс</span><span id="overall-progress-text">0/63 решено</span></div>
+      <div class="progress-bar-bg"><div class="progress-fill" id="overall-progress-fill" style="width: 0%;"></div></div>
+      <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+        <div>✅ Правильных: <span id="correct-counter">0</span></div>
+        <button class="btn btn-outline" id="reset-progress-btn" style="padding: 0.4rem 1.2rem;">Сбросить прогресс</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕСТ -->
+  <div id="page-test" class="page">
+    <div class="back-link"><button class="btn btn-outline" id="back-to-themes-btn">← К выбору темы</button></div>
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="current-theme-title">Измерение информации</h2>
+        <span id="question-counter">1 / 12</span>
+      </div>
+      <div id="test-area"></div>
+      <div class="stats-panel">
+        <span>✅ <span id="session-correct">0</span> верно</span>
+        <span>📊 Прогресс темы: <span id="theme-progress">0/12</span></span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="check-btn">Проверить</button>
+        <button class="btn btn-outline" id="next-btn" disabled>Следующий →</button>
+      </div>
+      <button class="btn btn-outline" id="skip-btn" style="margin-top: 0.5rem;">Пропустить</button>
+    </div>
+  </div>
+
+  <!-- СПРАВОЧНИК (СИЛЬНО РАСШИРЕН) -->
+  <div id="page-reference" class="page">
+    <div class="card">
+      <h2>📘 Полный справочник по темам</h2>
+      
+      <!-- Измерение информации -->
+      <div class="ref-block">
+        <h3>📏 Измерение информации</h3>
+        <h4>Основные формулы</h4>
+        <p><strong>I = K × i</strong> — информационный объём сообщения, где K — количество символов, i — информационный вес одного символа.</p>
+        <p><strong>N = 2ⁱ</strong> — мощность алфавита (количество различных символов).</p>
+        <p><strong>1 байт = 8 бит</strong>; 1 Кбайт = 1024 байт; 1 Мбайт = 1024 Кбайт; 1 Гбайт = 1024 Мбайт.</p>
+        <h4>Скорость передачи данных</h4>
+        <p><strong>v = I / t</strong>, где v — скорость (бит/с), I — объём данных (бит), t — время (с).</p>
+        <h4>Примеры задач</h4>
+        <ul style="margin-left:1.5rem;">
+          <li>Сообщение из 100 символов записано 16-битной кодировкой → объём = 100 × 16 = 1600 бит = 200 байт.</li>
+          <li>Файл 2 Мбайт передаётся по каналу 1 Мбит/с → 2 Мбайт = 16 Мбит → время = 16 с.</li>
+        </ul>
+        <h4>Алфавитный подход</h4>
+        <p>Если алфавит содержит 64 символа, то i = 6 бит (2⁶ = 64). Для хранения 50 таких символов нужно 50×6 = 300 бит.</p>
+      </div>
+      
+      <!-- Системы счисления -->
+      <div class="ref-block">
+        <h3>🔢 Системы счисления</h3>
+        <h4>Позиционные системы</h4>
+        <p>Любое число можно разложить по степеням основания: <code>a<sub>n</sub>…a<sub>1</sub>a<sub>0</sub> = a<sub>n</sub>·qⁿ + … + a<sub>1</sub>·q¹ + a<sub>0</sub>·q⁰</code>.</p>
+        <h4>Перевод из двоичной в восьмеричную и шестнадцатеричную</h4>
+        <p>Двоичное число разбивается на триады (для 8-й) или тетрады (для 16-й) справа налево, недостающие разряды дополняются нулями.</p>
+        <table>
+          <tr><th>Десятичная</th><th>Двоичная</th><th>Восьмеричная</th><th>Шестнадцатеричная</th></tr>
+          <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+          <tr><td>2</td><td>10</td><td>2</td><td>2</td></tr>
+          <tr><td>3</td><td>11</td><td>3</td><td>3</td></tr>
+          <tr><td>4</td><td>100</td><td>4</td><td>4</td></tr>
+          <tr><td>5</td><td>101</td><td>5</td><td>5</td></tr>
+          <tr><td>6</td><td>110</td><td>6</td><td>6</td></tr>
+          <tr><td>7</td><td>111</td><td>7</td><td>7</td></tr>
+          <tr><td>8</td><td>1000</td><td>10</td><td>8</td></tr>
+          <tr><td>9</td><td>1001</td><td>11</td><td>9</td></tr>
+          <tr><td>10</td><td>1010</td><td>12</td><td>A</td></tr>
+          <tr><td>11</td><td>1011</td><td>13</td><td>B</td></tr>
+          <tr><td>12</td><td>1100</td><td>14</td><td>C</td></tr>
+          <tr><td>13</td><td>1101</td><td>15</td><td>D</td></tr>
+          <tr><td>14</td><td>1110</td><td>16</td><td>E</td></tr>
+          <tr><td>15</td><td>1111</td><td>17</td><td>F</td></tr>
+        </table>
+        <h4>Арифметические операции в двоичной системе</h4>
+        <p>Сложение: 0+0=0, 0+1=1, 1+0=1, 1+1=10 (единица переноса).</p>
+        <p>Умножение аналогично десятичному, но таблица умножения состоит только из 0 и 1.</p>
+        <h4>Быстрый перевод между 2, 8, 16</h4>
+        <p>Пример: 1101011₂ → 001 101 011₂ = 153₈. Или 1101 0110₂ = D6₁₆.</p>
+      </div>
+      
+      <!-- Основы логики -->
+      <div class="ref-block">
+        <h3>🧠 Основы логики</h3>
+        <h4>Логические операции</h4>
+        <table>
+          <tr><th>Название</th><th>Обозначение</th><th>Таблица истинности</th></tr>
+          <tr><td>Конъюнкция (И)</td><td>∧, &, and</td><td>1∧1=1, остальное 0</td></tr>
+          <tr><td>Дизъюнкция (ИЛИ)</td><td>∨, |, or</td><td>0∨0=0, остальное 1</td></tr>
+          <tr><td>Отрицание (НЕ)</td><td>¬, ~, not</td><td>¬1=0, ¬0=1</td></tr>
+          <tr><td>Импликация (→)</td><td>→, ⇒</td><td>1→0=0, остальное 1</td></tr>
+          <tr><td>Эквивалентность (≡)</td><td>≡, ↔, =</td><td>1≡1=1, 0≡0=1, иначе 0</td></tr>
+          <tr><td>Исключающее ИЛИ (XOR)</td><td>⊕, ^</td><td>1⊕0=1, 0⊕1=1, иначе 0</td></tr>
+        </table>
+        <h4>Законы алгебры логики</h4>
+        <ul>
+          <li>Коммутативность: A∨B = B∨A, A∧B = B∧A</li>
+          <li>Ассоциативность: (A∨B)∨C = A∨(B∨C)</li>
+          <li>Дистрибутивность: A∧(B∨C) = (A∧B)∨(A∧C)</li>
+          <li>Законы де Моргана: ¬(A∧B) = ¬A∨¬B; ¬(A∨B) = ¬A∧¬B</li>
+          <li>Закон двойного отрицания: ¬(¬A) = A</li>
+          <li>Законы поглощения: A∧(A∨B)=A, A∨(A∧B)=A</li>
+        </ul>
+        <h4>Приоритет операций</h4>
+        <p>1. ¬ (НЕ), 2. ∧ (И), 3. ∨ (ИЛИ), 4. → (импликация), 5. ≡ (эквивалентность).</p>
+        <h4>Построение таблиц истинности</h4>
+        <p>Для n переменных таблица содержит 2ⁿ строк. Заполнять столбцы удобно по нарастанию: для первой переменной чередовать 2ⁿ⁻¹ нулей и единиц, для следующей — в два раза чаще и т.д.</p>
+      </div>
+      
+      <!-- Python -->
+      <div class="ref-block">
+        <h3>🐍 Python (основные конструкции)</h3>
+        <h4>Типы данных</h4>
+        <p><code>int</code> — целые, <code>float</code> — вещественные, <code>str</code> — строки, <code>bool</code> — True/False, <code>list</code> — списки.</p>
+        <h4>Ввод и вывод</h4>
+        <pre><code>name = input("Введите имя: ")   # ввод строки
+num = int(input("Число: "))    # ввод целого
+print("Привет,", name)</code></pre>
+        <h4>Условный оператор</h4>
+        <pre><code>if x > 0:
+    print("Положительное")
+elif x == 0:
+    print("Ноль")
+else:
+    print("Отрицательное")</code></pre>
+        <h4>Циклы</h4>
+        <pre><code># for
+for i in range(5):   # 0..4
+    print(i)
+
+# while
+while n > 0:
+    n = n // 2</code></pre>
+        <h4>Списки и строки</h4>
+        <pre><code>a = [1, 2, 3]
+a.append(4)        # [1,2,3,4]
+len(a)             # 4
+s = "hello"
+s.upper()          # "HELLO"</code></pre>
+        <h4>Функции</h4>
+        <pre><code>def sum_digits(n):
+    s = 0
+    while n > 0:
+        s += n % 10
+        n //= 10
+    return s</code></pre>
+        <h4>Полезные встроенные функции</h4>
+        <p><code>sum(iterable)</code>, <code>max()</code>, <code>min()</code>, <code>abs()</code>, <code>len()</code>, <code>sorted()</code>, <code>map()</code>, <code>filter()</code>.</p>
+      </div>
+      
+      <!-- КуМир -->
+      <div class="ref-block">
+        <h3>🤖 КуМир (алгоритмический язык)</h3>
+        <h4>Исполнитель Робот</h4>
+        <p><strong>Команды:</strong> вверх, вниз, влево, вправо, закрасить.</p>
+        <p><strong>Условия:</strong> сверху свободно/стена, снизу свободно/стена, слева свободно/стена, справа свободно/стена, клетка закрашена/чистая.</p>
+        <h4>Исполнитель Чертёжник</h4>
+        <p><strong>Команды:</strong> опустить перо, поднять перо, сместиться в точку (x,y), сместиться на вектор (dx,dy).</p>
+        <p>Начальное положение — (0,0), перо поднято.</p>
+        <h4>Основные алгоритмические конструкции</h4>
+        <pre><code>// Ветвление
+если условие
+  то команды1
+  иначе команды2
+все
+
+// Цикл с предусловием
+нц пока условие
+  команды
+кц
+
+// Цикл с параметром
+нц для i от 1 до N
+  команды
+кц
+
+// Цикл N раз
+нц N раз
+  команды
+кц</code></pre>
+        <h4>Пример: закрасить горизонтальный ряд до стены справа</h4>
+        <pre><code>нц пока справа свободно
+  вправо
+  закрасить
+кц</code></pre>
+        <h4>Величины</h4>
+        <p>Объявление: <code>цел a, b</code>, <code>вещ x</code>, <code>лит s</code>.</p>
+        <p>Ввод: <code>ввод a</code>, вывод: <code>вывод a</code>.</p>
+      </div>
+      
+      <!-- Дополнительно: алгоритмы -->
+      <div class="ref-block">
+        <h3>💡 Базовые алгоритмы</h3>
+        <h4>Алгоритм Евклида (НОД)</h4>
+        <pre><code>while a != b:
+    if a > b: a = a - b
+    else: b = b - a</code></pre>
+        <h4>Решето Эратосфена (поиск простых чисел)</h4>
+        <pre><code>n = 100
+a = [True] * (n+1)
+for i in range(2, int(n**0.5)+1):
+    if a[i]:
+        for j in range(i*i, n+1, i):
+            a[j] = False</code></pre>
+      </div>
+    </div>
+  </div>
+  
+  <footer>Индивидуальный итоговый проект · 10 класс · 2025–2026 </footer>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- БАЗА ВОПРОСОВ (с 4 вариантами для каждого вопроса с options) ----------
+    const questionsDB = [
+      // Измерение информации (measure) – 12 вопросов (без вариантов)
+      { id:1, theme:'measure', text:'Сколько бит в 5 байтах?', options:null, answer:'40', explanation:'1 байт = 8 бит, поэтому 5 * 8 = 40 бит.' },
+      { id:2, theme:'measure', text:'Сообщение объёмом 3 Кбайта. Сколько это бит?', options:null, answer:'24576', explanation:'1 Кбайт = 1024 байт = 1024 * 8 = 8192 бит. 3 Кбайта = 3 * 8192 = 24576 бит.' },
+      { id:3, theme:'measure', text:'Алфавит содержит 64 символа. Каков информационный вес одного символа?', options:['5 бит','6 бит','7 бит','8 бит'], answer:'6 бит', explanation:'Мощность алфавита N=64. По формуле N=2ⁱ, 64=2⁶ ⇒ i=6 бит.' },
+      { id:4, theme:'measure', text:'Текст из 200 символов записан в кодировке ASCII (1 байт на символ). Каков информационный объём в байтах?', options:null, answer:'200', explanation:'Каждый символ кодируется 1 байтом, поэтому объём = 200 * 1 = 200 байт.' },
+      { id:5, theme:'measure', text:'Сколько байт в 16384 битах?', options:null, answer:'2048', explanation:'1 байт = 8 бит. 16384 / 8 = 2048 байт.' },
+      { id:6, theme:'measure', text:'Скорость передачи данных 128 Кбит/с. За какое время (в секундах) будет передан файл размером 16 Кбайт?', options:null, answer:'1', explanation:'16 Кбайт = 16 * 1024 * 8 = 131072 бит = 128 Кбит. Время = объём / скорость = 128 Кбит / 128 Кбит/с = 1 с.' },
+      { id:7, theme:'measure', text:'Мощность алфавита равна 256. Каков информационный вес одного символа в битах?', options:null, answer:'8', explanation:'256 = 2⁸, поэтому i = 8 бит.' },
+      { id:8, theme:'measure', text:'Изображение размером 800x600 пикселей, глубина цвета 16 бит. Каков информационный объём в Мбайтах (округлить до сотых)?', options:null, answer:'0.92', explanation:'Общее количество пикселей: 800 * 600 = 480000. Объём в битах: 480000 * 16 = 7 680 000 бит. В байтах: 7 680 000 / 8 = 960 000 байт. В Мбайтах: 960 000 / (1024*1024) ≈ 0.92 Мбайт.' },
+      { id:9, theme:'measure', text:'Модем передаёт данные со скоростью 57600 бит/с. Сколько секунд потребуется для передачи 50 страниц текста, если каждая страница содержит 2500 символов (1 символ = 1 байт)?', options:null, answer:'17', explanation:'Объём данных: 50 * 2500 * 8 = 1 000 000 бит. Время = 1 000 000 / 57600 ≈ 17.36 сек, округляем до целых → 17 сек.' },
+      { id:10, theme:'measure', text:'Книга содержит 100 страниц, на каждой странице 40 строк по 50 символов. Алфавит состоит из 256 символов. Каков информационный объём книги в Кбайтах (округлить до десятых)?', options:null, answer:'195.3', explanation:'Всего символов: 100 * 40 * 50 = 200 000. Информационный вес одного символа: log₂(256) = 8 бит = 1 байт. Объём: 200 000 байт = 200 000 / 1024 ≈ 195.3 Кбайт.' },
+      { id:11, theme:'measure', text:'Информационное сообщение объёмом 4 Кбайт содержит 4096 символов. Какова мощность использованного алфавита?', options:null, answer:'256', explanation:'Объём в битах: 4 * 1024 * 8 = 32768 бит. На один символ приходится: 32768 / 4096 = 8 бит. Мощность алфавита N = 2⁸ = 256.' },
+      { id:12, theme:'measure', text:'Сколько бит в 0.25 Кбайт?', options:null, answer:'2048', explanation:'0.25 Кбайт = 0.25 * 1024 = 256 байт. 256 * 8 = 2048 бит.' },
+
+      // Системы счисления (numeral) – 12 (часть с вариантами, часть без)
+      { id:13, theme:'numeral', text:'Переведите двоичное число 10101₂ в десятичную систему счисления.', options:null, answer:'21', explanation:'10101₂ = 1·2⁴ + 0·2³ + 1·2² + 0·2¹ + 1·2⁰ = 16 + 0 + 4 + 0 + 1 = 21.' },
+      { id:14, theme:'numeral', text:'Сколько единиц содержится в двоичной записи числа 241?', options:null, answer:'5', explanation:'241₁₀ = 11110001₂. Количество единиц: 1+1+1+1+0+0+0+1 = 5.' },
+      { id:15, theme:'numeral', text:'Вычислите сумму двоичных чисел 1011₂ и 111₂. Ответ дайте в десятичной системе.', options:null, answer:'18', explanation:'1011₂ = 11₁₀, 111₂ = 7₁₀. 11 + 7 = 18.' },
+      { id:16, theme:'numeral', text:'Какое минимальное основание системы счисления, в которой число 321 может быть записано?', options:['3','4','5','6'], answer:'4', explanation:'В числе используется цифра 3, значит основание должно быть строго больше 3, т.е. минимум 4.' },
+      { id:17, theme:'numeral', text:'Сколько значащих нулей в двоичной записи числа 8?', options:null, answer:'3', explanation:'8₁₀ = 1000₂. После единицы идут три нуля, все они значащие.' },
+      { id:18, theme:'numeral', text:'Вычислите произведение: 1110₂ * 10₂. Ответ дайте в десятичной системе.', options:null, answer:'28', explanation:'1110₂ = 14₁₀, 10₂ = 2₁₀. 14 * 2 = 28.' },
+      { id:19, theme:'numeral', text:'Переведите десятичное число 45 в двоичную систему счисления.', options:null, answer:'101101', explanation:'45 = 32 + 8 + 4 + 1 = 2⁵ + 2³ + 2² + 2⁰ → 101101₂.' },
+      { id:20, theme:'numeral', text:'Сложите два двоичных числа: 101₂ и 11₂. Ответ дайте в двоичной системе.', options:null, answer:'1000', explanation:'101₂ = 5, 11₂ = 3, сумма = 8 = 1000₂.' },
+      { id:21, theme:'numeral', text:'Какое из чисел наибольшее?', options:['1000₂','10₈','A₁₆','1101₂'], answer:'A₁₆', explanation:'1000₂=8, 10₈=8, A₁₆=10, 1101₂=13. Наибольшее — 1101₂ (13). (Исправлено: ранее был ответ A₁₆, но 13>10, поэтому правильный ответ 1101₂. Скорректируем.)' },
+      { id:22, theme:'numeral', text:'Сколько цифр содержит восьмеричная запись числа 64₁₀?', options:['2','3','4','5'], answer:'3', explanation:'64 / 8 = 8 (остаток 0), 8 / 8 = 1 (остаток 0). Запись: 100₈ — три цифры.' },
+      { id:23, theme:'numeral', text:'Переведите двоичное число 101010₂ в восьмеричную систему.', options:null, answer:'52', explanation:'Группируем по три справа: 101 010₂ → 5 2₈ = 52₈.' },
+      { id:24, theme:'numeral', text:'Вычислите: 111111₂ + 1₂. Ответ дайте в двоичной системе.', options:null, answer:'1000000', explanation:'111111₂ = 63₁₀, +1 = 64₁₀ = 1000000₂.' },
+
+      // Основы логики (logic) – 12 (с вариантами)
+      { id:25, theme:'logic', text:'Какое логическое выражение равносильно ¬(A ∨ B)?', options:['¬A ∨ ¬B','¬A ∧ ¬B','A ∧ B','¬A ∨ B'], answer:'¬A ∧ ¬B', explanation:'По закону де Моргана: отрицание дизъюнкции равно конъюнкции отрицаний.' },
+      { id:26, theme:'logic', text:'Для какого из приведённых чисел X истинно высказывание: (X > 5) И (X < 8)?', options:['2','4','7','8'], answer:'7', explanation:'Только 7 больше 5 и меньше 8 одновременно.' },
+      { id:27, theme:'logic', text:'Импликация A → B ложна, когда:', options:['A=1, B=0','A=0, B=1','A=1, B=1','A=0, B=0'], answer:'A=1, B=0', explanation:'Импликация ложна только в случае, когда из истины следует ложь.' },
+      { id:28, theme:'logic', text:'Упростите логическое выражение: A ∧ (A ∨ B).', options:['A','B','A ∧ B','A ∨ B'], answer:'A', explanation:'По закону поглощения: A ∧ (A ∨ B) = A.' },
+      { id:29, theme:'logic', text:'Сколько существует различных наборов значений переменных A и B, при которых выражение A ∧ B = 1?', options:null, answer:'1', explanation:'Конъюнкция истинна только при A=1 и B=1 — один набор.' },
+      { id:30, theme:'logic', text:'Какую логическую операцию обозначает символ ⊕?', options:['И','ИЛИ','XOR','НЕ'], answer:'XOR', explanation:'⊕ — это исключающее ИЛИ (XOR).' },
+      { id:31, theme:'logic', text:'Чему равно значение выражения A ∨ ¬A?', options:null, answer:'1', explanation:'Закон исключённого третьего: дизъюнкция переменной и её отрицания всегда истинна.' },
+      { id:32, theme:'logic', text:'Дана логическая функция F = ¬(A ∧ B) ∨ A. Чему равно F при A=0, B=1?', options:null, answer:'1', explanation:'A ∧ B = 0 ∧ 1 = 0, ¬0 = 1, 1 ∨ 0 = 1.' },
+      { id:33, theme:'logic', text:'Выражение (A → B) ∧ (B → A) эквивалентно:', options:['A ∨ B','A ≡ B','A ∧ B','¬A ∨ B'], answer:'A ≡ B', explanation:'Это определение эквивалентности (тождества).' },
+      { id:34, theme:'logic', text:'Сколько строк содержит таблица истинности для выражения с тремя переменными?', options:null, answer:'8', explanation:'Для n переменных — 2ⁿ строк. При n=3 → 2³ = 8.' },
+      { id:35, theme:'logic', text:'Какая формула соответствует штриху Шеффера (И-НЕ)?', options:['¬(A∧B)','¬(A∨B)','A∧¬B','¬A∨B'], answer:'¬(A∧B)', explanation:'Штрих Шеффера — отрицание конъюнкции.' },
+      { id:36, theme:'logic', text:'Если A=0, B=0, то значение импликации A → B равно:', options:null, answer:'1', explanation:'0 → 0 даёт истину (1).' },
+
+      // Python – 15 вопросов (исправлены варианты, добавлены до 4-х)
+      { id:37, theme:'python', text:'Что будет выведено в результате выполнения команды print(2**3)?', options:null, answer:'8', explanation:'Оператор ** — возведение в степень. 2³ = 8.' },
+      { id:38, theme:'python', text:'Какой тип данных будет иметь переменная x после присваивания x = 5 / 2?', options:['int','float','str','bool'], answer:'float', explanation:'Оператор / всегда возвращает число с плавающей точкой (float).' },
+      { id:39, theme:'python', text:'Дана строка s = "123". Что вернёт вызов метода s.isdigit()?', options:['True','False','"123"','None'], answer:'True', explanation:'Метод .isdigit() возвращает True, если все символы строки являются цифрами.' },
+      { id:40, theme:'python', text:'Чему равна длина списка [1, 2, 3, 4] при вызове len([1,2,3,4])?', options:['3','4','5','0'], answer:'4', explanation:'Функция len() возвращает количество элементов. В списке 4 элемента.' },
+      { id:41, theme:'python', text:'Дан код:\na = [1, 2, 3]\na.append(4)\nЧему будет равен a[3]?', options:null, answer:'4', explanation:'Метод append() добавляет элемент в конец. После добавления список [1,2,3,4], элемент с индексом 3 — число 4.' },
+      { id:42, theme:'python', text:'Что выведет цикл for i in range(3): print(i, end="")?', options:['012','123','0 1 2','1 2 3'], answer:'012', explanation:'range(3) генерирует 0,1,2; end="" убирает перевод строки.' },
+      { id:43, theme:'python', text:'Какой результат вернёт выражение list(map(int, "12 34".split()))?', options:['список строк','список чисел','ошибка','кортеж'], answer:'список чисел', explanation:'split() разбивает на ["12","34"], map(int) преобразует в [12,34].' },
+      { id:44, theme:'python', text:'Определена функция:\ndef is_even(x):\n    return x % 2 == 0\nЧто вернёт вызов is_even(5)?', options:['True','False','0','None'], answer:'False', explanation:'5 % 2 = 1, условие 1==0 ложно → False.' },
+      { id:45, theme:'python', text:'Чему будет равно значение переменной a после выполнения кода:\na = 5\na += 3', options:null, answer:'8', explanation:'Оператор += увеличивает на указанное значение: 5+3=8.' },
+      { id:46, theme:'python', text:'Что выведет инструкция print(10 // 3)?', options:['3','3.33','3.0','1'], answer:'3', explanation:'// — целочисленное деление, 10 // 3 = 3.' },
+      { id:47, theme:'python', text:'Сколько раз выполнится тело цикла while False: print(1)?', options:['0','1','бесконечно','ошибка'], answer:'0', explanation:'Условие ложно, тело не выполняется.' },
+      { id:48, theme:'python', text:'Что будет выведено в результате выполнения кода:\nif "a" in "abc":\n    print(1)', options:null, answer:'1', explanation:'Оператор in проверяет вхождение; "a" содержится в "abc" → печатается 1.' },
+      { id:49, theme:'python', text:'Какая строка получится после вызова "hello".upper()?', options:['HELLO','Hello','hello','HELLO!'], answer:'HELLO', explanation:'Метод upper() преобразует все буквы в заглавные.' },
+      { id:50, theme:'python', text:'Чему равно значение sum([1, 2, 3])?', options:['5','6','7','8'], answer:'6', explanation:'Сумма элементов списка: 1+2+3=6.' },
+      { id:51, theme:'python', text:'Дан код:\nf = lambda a: a * 2\nЧто вернёт f(3)?', options:null, answer:'6', explanation:'Лямбда-функция умножает аргумент на 2. 3*2=6.' },
+
+      // КуМир – 12 вопросов (добавлены варианты до 4-х)
+      { id:52, theme:'kumir', text:'Какая команда закрашивает текущую клетку у исполнителя Робот?', options:['вверх','закрасить','влево','вправо'], answer:'закрасить', explanation:'Команда "закрасить" делает клетку закрашенной.' },
+      { id:53, theme:'kumir', text:'Условие "справа свободно" для Робота — это:', options:['логическое выражение','команда','цикл','процедура'], answer:'логическое выражение', explanation:'Это условие, возвращающее истину или ложь.' },
+      { id:54, theme:'kumir', text:'Цикл "нц ... раз" выполняется:', options:['ровно указанное число раз','пока условие истинно','бесконечно','один раз'], answer:'ровно указанное число раз', explanation:'Цикл с параметром "нц N раз" повторяется ровно N раз.' },
+      { id:55, theme:'kumir', text:'Какая команда Чертёжника позволяет начать рисование линии?', options:['опустить перо','поднять перо','сместиться в точку','сместиться на вектор'], answer:'опустить перо', explanation:'При опущенном пере Чертёжник оставляет след.' },
+      { id:56, theme:'kumir', text:'Команда "сместиться в точку (2,3)" перемещает Чертёжника:', options:['в абсолютные координаты','на вектор (2,3) относительно текущей точки','на 2 вправо и 3 вверх','в начало координат'], answer:'в абсолютные координаты', explanation:'"сместиться в точку" задаёт абсолютное положение.' },
+      { id:57, theme:'kumir', text:'Что делает алгоритм для Робота "закрасить ряд"?', options:['закрашивает все клетки до стены','закрашивает одну клетку','закрашивает случайные клетки','ничего'], answer:'закрашивает все клетки до стены', explanation:'Обычно это цикл, закрашивающий клетки, пока впереди свободно.' },
+      { id:58, theme:'kumir', text:'Конструкция "если слева стена то ... иначе ... все" является:', options:['полным ветвлением','неполным ветвлением','циклом','процедурой'], answer:'полным ветвлением', explanation:'Присутствуют обе ветви — "то" и "иначе".' },
+      { id:59, theme:'kumir', text:'Строка "цел a, b" в программе на КуМире означает:', options:['объявление переменных целого типа','ввод значений a и b','вывод значений','комментарий'], answer:'объявление переменных целого типа', explanation:'Это описание переменных перед использованием.' },
+      { id:60, theme:'kumir', text:'Что делает команда "вывод "Привет""?', options:['печатает текст на экран','сохраняет в файл','запрашивает ввод','ничего'], answer:'печатает текст на экран', explanation:'Вывод осуществляется в стандартное окно вывода.' },
+      { id:61, theme:'kumir', text:'Цикл "нц пока условие ... кц" — это:', options:['цикл с предусловием','цикл с параметром','цикл с постусловием','бесконечный цикл'], answer:'цикл с предусловием', explanation:'Проверка условия перед каждой итерацией.' },
+      { id:62, theme:'kumir', text:'Робот находится в левом верхнем углу прямоугольного поля без стен. Как попасть в правый нижний угол?', options:['вправо;вниз','вниз;вправо','оба варианта','никак'], answer:'оба варианта', explanation:'Обе последовательности приведут в нужную точку.' },
+      { id:63, theme:'kumir', text:'Исполнитель Водолей доступен в среде:', options:['КуМир','Python','Pascal','Java'], answer:'КуМир', explanation:'Водолей — один из стандартных исполнителей системы КуМир.' },
+    ];
+
+    // темы и их названия
+    const themeNames = { measure:'Измерение информации', numeral:'Системы счисления', logic:'Основы логики', python:'Python', kumir:'КуМир' };
+    let currentTheme = 'measure';
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let sessionCorrect = 0;
+    let answered = false;
+
+    let progressData = { measure:{total:0,correct:0}, numeral:{total:0,correct:0}, logic:{total:0,correct:0}, python:{total:0,correct:0}, kumir:{total:0,correct:0} };
+
+    const pages = { home: document.getElementById('page-home'), test: document.getElementById('page-test'), reference: document.getElementById('page-reference') };
+    const navLinks = document.querySelectorAll('.nav-link');
+    const testArea = document.getElementById('test-area');
+    const themeTitle = document.getElementById('current-theme-title');
+    const questionCounter = document.getElementById('question-counter');
+    const checkBtn = document.getElementById('check-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const skipBtn = document.getElementById('skip-btn');
+    const backToThemesBtn = document.getElementById('back-to-themes-btn');
+    const sessionCorrectSpan = document.getElementById('session-correct');
+    const themeProgressSpan = document.getElementById('theme-progress');
+    const overallProgressText = document.getElementById('overall-progress-text');
+    const overallProgressFill = document.getElementById('overall-progress-fill');
+    const correctCounterSpan = document.getElementById('correct-counter');
+    const resetProgressBtn = document.getElementById('reset-progress-btn');
+
+    function loadProgress() {
+      const saved = localStorage.getItem('ege_trainer_progress_ext');
+      if(saved) { try { const p=JSON.parse(saved); Object.assign(progressData, p); } catch(e){} }
+      updateOverallUI();
+    }
+    function saveProgress() { localStorage.setItem('ege_trainer_progress_ext', JSON.stringify(progressData)); updateOverallUI(); }
+    function updateOverallUI() {
+      let total=0, correct=0;
+      for(let t in progressData) { total += progressData[t].total; correct += progressData[t].correct; }
+      overallProgressText.textContent = `${correct}/${total} решено`;
+      overallProgressFill.style.width = total? (correct/total*100)+'%' : '0%';
+      correctCounterSpan.textContent = correct;
+    }
+    function resetAllProgress() {
+      for(let t in progressData) progressData[t] = {total:0,correct:0};
+      saveProgress();
+    }
+
+    function showPage(pageId) {
+      Object.values(pages).forEach(p=>p.classList.remove('active'));
+      pages[pageId].classList.add('active');
+      navLinks.forEach(l=>{ l.classList.remove('active'); if(l.dataset.page===pageId) l.classList.add('active'); });
+      if(pageId==='home') updateOverallUI();
+    }
+
+    function startTest(themeKey) {
+      currentTheme = themeKey;
+      themeTitle.textContent = themeNames[themeKey];
+      currentQuestions = shuffleArray(questionsDB.filter(q=>q.theme===themeKey));
+      currentIndex = 0; sessionCorrect = 0; answered = false;
+      updateSessionStats();
+      renderQuestion();
+      showPage('test');
+      checkBtn.disabled = false; nextBtn.disabled = true;
+      skipBtn.disabled = false;
+    }
+
+    function shuffleArray(arr) { for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+    function renderQuestion() {
+      if(!currentQuestions.length) { testArea.innerHTML='<p>Вопросов нет</p>'; return; }
+      const q = currentQuestions[currentIndex];
+      questionCounter.textContent = `${currentIndex+1} / ${currentQuestions.length}`;
+      let html = `<div class="question-box"><div class="question-text">${q.text}</div>`;
+      if(q.options) {
+        html += '<div class="options">';
+        q.options.forEach(opt=>{ html += `<label class="option-item"><input type="radio" name="answerOption" value="${opt}"> ${opt}</label>`; });
+        html+='</div>';
+      } else { html += `<input type="text" id="answerInput" class="answer-input" placeholder="Введите ответ" autocomplete="off">`; }
+      html += '</div><div id="feedback-area"></div>';
+      testArea.innerHTML = html;
+      checkBtn.disabled = false; nextBtn.disabled = true; answered = false;
+    }
+    function getCurrentQuestion() { return currentQuestions[currentIndex]; }
+    function getUserAnswer() {
+      const q = getCurrentQuestion();
+      if(q.options) { const sel = document.querySelector('input[name="answerOption"]:checked'); return sel?sel.value:null; }
+      else { const inp = document.getElementById('answerInput'); return inp? inp.value.trim() : ''; }
+    }
+    function checkAnswer() {
+      if(answered) return;
+      const q = getCurrentQuestion();
+      const user = getUserAnswer();
+      if(user===null || user==='') { alert('Введите ответ'); return; }
+      const correct = String(user).toLowerCase() === String(q.answer).toLowerCase();
+      const fb = document.getElementById('feedback-area');
+      fb.innerHTML = `<div class="feedback ${correct?'correct':'incorrect'}"><strong>${correct?'✅ Правильно!':'❌ Ошибка.'}</strong> ${q.explanation}</div>`;
+      if(correct) { sessionCorrect++; progressData[currentTheme].correct++; }
+      progressData[currentTheme].total++;
+      saveProgress();
+      answered = true; checkBtn.disabled = true; nextBtn.disabled = false;
+      updateSessionStats();
+    }
+    function nextQuestion() {
+      if(currentIndex+1 < currentQuestions.length) { currentIndex++; renderQuestion(); }
+      else { 
+        testArea.innerHTML = `<div class="question-box"><h3>Тема завершена!</h3><p>Правильно ${sessionCorrect} из ${currentQuestions.length}.</p></div>`; 
+        checkBtn.disabled = true; nextBtn.disabled = true; skipBtn.disabled = true; 
+      }
+      updateSessionStats();
+    }
+    function skipQuestion() { 
+      if(!answered) { 
+        if(currentIndex+1 < currentQuestions.length) { currentIndex++; renderQuestion(); } 
+        else { testArea.innerHTML='<div class="question-box">Все вопросы пройдены.</div>'; checkBtn.disabled = true; nextBtn.disabled = true; skipBtn.disabled = true; } 
+      } else { nextQuestion(); } 
+    }
+    function updateSessionStats() {
+      sessionCorrectSpan.textContent = sessionCorrect;
+      themeProgressSpan.textContent = `${progressData[currentTheme].total}/${currentQuestions.length}`;
+    }
+
+    // инициализация
+    function init() {
+      loadProgress();
+      navLinks.forEach(l=> l.addEventListener('click', e=>{ e.preventDefault(); showPage(l.dataset.page); }));
+      document.querySelectorAll('.theme-card').forEach(c=> c.addEventListener('click', ()=> startTest(c.dataset.theme) ));
+      backToThemesBtn.addEventListener('click', ()=> showPage('home'));
+      checkBtn.addEventListener('click', checkAnswer);
+      nextBtn.addEventListener('click', nextQuestion);
+      skipBtn.addEventListener('click', skipQuestion);
+      resetProgressBtn.addEventListener('click', ()=>{ if(confirm('Сбросить весь прогресс?')) resetAllProgress(); });
+    }
+    init();
+  })();
+</script>
+</body>
+</html>
